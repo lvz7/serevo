@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BuchenRouteImport } from './routes/buchen'
 import { Route as CancelRouteImport } from './routes/cancel'
 import { Route as SuccessRouteImport } from './routes/success'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuchenRoute = BuchenRouteImport.update({
+  id: '/buchen',
+  path: '/buchen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CancelRoute = CancelRouteImport.update({
@@ -31,30 +37,34 @@ const SuccessRoute = SuccessRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/buchen': typeof BuchenRoute
   '/cancel': typeof CancelRoute
   '/success': typeof SuccessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/buchen': typeof BuchenRoute
   '/cancel': typeof CancelRoute
   '/success': typeof SuccessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/buchen': typeof BuchenRoute
   '/cancel': typeof CancelRoute
   '/success': typeof SuccessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/cancel' | '/success'
+  fullPaths: '/' | '/buchen' | '/cancel' | '/success'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cancel' | '/success'
-  id: '__root__' | '/' | '/cancel' | '/success'
+  to: '/' | '/buchen' | '/cancel' | '/success'
+  id: '__root__' | '/' | '/buchen' | '/cancel' | '/success'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BuchenRoute: typeof BuchenRoute
   CancelRoute: typeof CancelRoute
   SuccessRoute: typeof SuccessRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/buchen': {
+      id: '/buchen'
+      path: '/buchen'
+      fullPath: '/buchen'
+      preLoaderRoute: typeof BuchenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cancel': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BuchenRoute: BuchenRoute,
   CancelRoute: CancelRoute,
   SuccessRoute: SuccessRoute,
 }

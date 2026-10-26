@@ -10,6 +10,7 @@ import {
 import { type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { LangProvider } from "../lib/lang";
 
 function NotFoundComponent() {
   return (
@@ -73,12 +74,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Serevo – Kübelreinigung Region Zürich" },
+      { title: "Serevo – Reinigung für Haus & Garten in Rüschlikon" },
       {
         name: "description",
         content:
-          "Gründliche & hygienische Reinigung von Kompost- und Abfallkübeln vor Ort in der Region Zürich. Ab 20.– CHF.",
+          "Serevo aus Rüschlikon: Laub wischen, Fenster, Staubsaugen, Badezimmer, Komposttonnen-Reinigung und mehr. Faire Festpreise, online buchen.",
       },
+      { name: "theme-color", content: "#14332A" },
+      { property: "og:site_name", content: "Serevo" },
+      { property: "og:image", content: "/serevo-herbst-ad-poster.jpg" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -87,14 +91,50 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap",
+        rel: "preload",
+        href: "/fonts/fredoka-latin-600-normal.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
       },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HouseCleaningService",
+          name: "Serevo",
+          url: "https://www.serevo-services.com",
+          telephone: "+41797401171",
+          email: "serevo.services@gmail.com",
+          image: "https://www.serevo-services.com/icon-512.png",
+          priceRange: "CHF",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Rüschlikon",
+            addressCountry: "CH",
+          },
+          areaServed: "Rüschlikon und Region Zürich",
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: "Wednesday",
+              opens: "13:00",
+              closes: "20:00",
+            },
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: ["Saturday", "Sunday"],
+              opens: "08:00",
+              closes: "20:00",
+            },
+          ],
+        }),
+      },
     ],
   }),
 
@@ -124,7 +164,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <LangProvider>
+        <Outlet />
+      </LangProvider>
     </QueryClientProvider>
   );
 }

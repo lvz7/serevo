@@ -6,9 +6,15 @@ export const Route = createFileRoute("/cancel")({
   head: () => ({
     meta: [
       { title: "Zahlung abgebrochen – Serevo" },
-      { name: "description", content: "Die Zahlung wurde abgebrochen. Sie können die Buchung jederzeit erneut starten." },
+      {
+        name: "description",
+        content: "Die Zahlung wurde abgebrochen. Sie können die Buchung jederzeit erneut starten.",
+      },
       { property: "og:title", content: "Zahlung abgebrochen – Serevo" },
-      { property: "og:description", content: "Keine Belastung erfolgt – Buchung jederzeit erneut möglich." },
+      {
+        property: "og:description",
+        content: "Keine Belastung erfolgt – Buchung jederzeit erneut möglich.",
+      },
     ],
   }),
   validateSearch: (s: Record<string, unknown>): { lang: Lang } => ({

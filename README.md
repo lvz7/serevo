@@ -28,18 +28,44 @@ Every push to `main` deploys automatically after that.
 
 Netlify and Cloudflare also work without changes. On any other server: `npm run build`, then `npm start`.
 
-## Stripe
+## Prices, Stripe and bookings
 
-- The packages and their Stripe price IDs are in `src/lib/checkout.functions.ts`.
-- The prices shown on the page are in `src/lib/i18n.ts` (`plans`) and `planAmounts` – keep them the same as in Stripe.
-- The secret key and the price IDs must be from the same mode: a live key (`sk_live_…`) only works with live prices, a test key (`sk_test_…`) only with test prices.
-- If a checkout fails, the page shows a short message and the real Stripe error appears in the server logs (Vercel: **Logs** tab).
+- **All prices live in one file: `src/lib/catalog.ts`.** Change a price there and the price list,
+  the booking page and the Stripe checkout all update together. The server recalculates the total
+  from this file, so nobody can change the price in their browser.
+- Stripe products are **not** needed – each checkout is created with exactly the services,
+  quantities and tip the customer picked. A Komposttonne plan becomes a Stripe subscription.
+- Every online payment carries the booking (date, time, address, phone, services, notes) in its
+  **metadata** – open the payment in the Stripe dashboard to see it.
+- Opening days and time slots are in `src/lib/booking.ts` (`SLOTS`).
+
+### Booking e-mails (optional, free)
+
+Without this, cash bookings ask the customer to send the booking via WhatsApp or e-mail
+(the message is pre-written). To get every booking straight to your inbox instead:
+
+1. Create a free account at [resend.com](https://resend.com) **with serevo.services@gmail.com**.
+2. Create an API key and add it on Vercel as `RESEND_API_KEY`, then redeploy.
+
+You then get an e-mail for every cash booking and for every paid online booking.
+
+### Environment variables
+
+| Name | Required | What |
+| --- | --- | --- |
+| `STRIPE_SECRET_KEY` | for online payment | `sk_live_…` from Stripe → Developers → API keys |
+| `RESEND_API_KEY` | optional | booking e-mails (see above) |
+| `BOOKING_NOTIFY_EMAIL` | optional | where booking e-mails go (default serevo.services@gmail.com) |
+| `BOOKING_FROM_EMAIL` | optional | sender, once you verify your own domain in Resend |
 
 ## Where things are
 
 | What | File |
 | --- | --- |
-| Page layout and sections | `src/routes/index.tsx` |
+| Homepage | `src/routes/index.tsx` |
+| Booking page | `src/routes/buchen.tsx` |
+| Prices | `src/lib/catalog.ts` |
+| Header & footer | `src/components/site.tsx` |
 | All texts (German / English) | `src/lib/i18n.ts` |
 | Colours and fonts | `src/styles.css` |
 | Ad video, logo, favicon | `public/` |

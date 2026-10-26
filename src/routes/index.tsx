@@ -1,176 +1,92 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useRef, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useRef, useState } from "react";
 import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
+  Clock,
+  Leaf,
+  ListChecks,
+  MapPin,
+  MessageCircle,
+  ShieldCheck,
+  Sparkles,
+  Truck,
   Volume2,
   VolumeX,
-  MessageCircle,
-  Sparkles,
-  ShieldCheck,
-  Leaf,
-  MapPin,
-  Mail,
-  Phone,
-  Check,
-  Loader2,
-  ArrowRight,
 } from "lucide-react";
-import { content, planAmounts, type Lang, type PlanId } from "@/lib/i18n";
-import { createCheckoutSession } from "@/lib/checkout.functions";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { SiteFooter, SiteHeader, WhatsAppButton, whatsappUrl } from "@/components/site";
+import { BIN_PLANS, CATEGORIES, SERVICES, chf, type Service } from "@/lib/catalog";
+import { content, type Copy, type Lang } from "@/lib/i18n";
+import { useLang } from "@/lib/lang";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Serevo – Kübelreinigung Region Zürich" },
-      {
-        name: "description",
-        content:
-          "Kompost- und Abfallkübel professionell reinigen lassen – hygienisch, vor Ort, in der Region Zürich. Einmalig ab 30.– CHF oder im Abo ab 16.– CHF pro Monat.",
-      },
-      { property: "og:title", content: "Serevo – Kübelreinigung Region Zürich" },
-      {
-        property: "og:description",
-        content: "Gründliche & hygienische Kübelreinigung vor Ort in der Region Zürich.",
-      },
-    ],
-  }),
   component: Index,
 });
 
-const TIPS = [0, 200, 500];
-const icons = [Sparkles, ShieldCheck, Leaf];
-
-function chf(cents: number) {
-  return (cents / 100).toFixed(2).replace(".00", ".–");
-}
-
 function Index() {
-  const [lang, setLang] = useState<Lang>("de");
-  const [plan, setPlan] = useState<PlanId>("once");
-  const [tip, setTip] = useState(0);
-  const [customTip, setCustomTip] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { lang } = useLang();
   const t = content[lang];
-  const checkout = useServerFn(createCheckoutSession);
-
-  const total = useMemo(() => planAmounts[plan] + tip, [plan, tip]);
-  const intervalLabel =
-    plan === "monthly"
-      ? t.pricing.perMonth
-      : plan === "sixmonth"
-        ? lang === "de"
-          ? "/6 Monate"
-          : "/6 months"
-        : plan === "yearly"
-          ? lang === "de"
-            ? "/Jahr"
-            : "/year"
-          : null;
-
-  async function handleCheckout() {
-    setLoading(true);
-    setError(null);
-    try {
-      const { url } = await checkout({
-        data: { plan, tip, origin: window.location.origin, lang },
-      });
-      window.location.href = url;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Checkout failed");
-      setLoading(false);
-    }
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-          <a href="#top" className="flex items-center gap-2 font-extrabold tracking-tight">
-            <img src="/serevo-logo.png" alt="Serevo Logo" className="size-9 object-contain" />
-            Serevo
-          </a>
-          <nav className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            <a className="transition-colors hover:text-foreground" href="#services">
-              {t.nav.services}
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#laub">
-              {t.nav.leaves}
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#pricing">
-              {t.nav.prices}
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#story">
-              {t.nav.story}
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#contact">
-              {t.nav.contact}
-            </a>
-          </nav>
-          <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 text-xs font-semibold">
-            {(["de", "en"] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`rounded-full px-3 py-1 transition-colors ${
-                  lang === l
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
-      <main id="top">
+      <main>
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-14 md:grid-cols-2 md:py-24">
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-12 md:grid-cols-[1.15fr_1fr] md:py-20">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
               <MapPin className="size-3.5" />
               {t.hero.badge}
             </span>
-            <h1 className="mt-5 text-4xl font-extrabold leading-[1.08] md:text-5xl">
-              {t.hero.title}
-            </h1>
-            <p className="mt-5 max-w-md text-lg text-muted-foreground">{t.hero.sub}</p>
+            <h1 className="mt-5 text-4xl leading-[1.05] md:text-6xl">{t.hero.title}</h1>
+            <p className="mt-5 max-w-lg text-lg text-muted-foreground">{t.hero.sub}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="#pricing"
+              <Link
+                to="/buchen"
                 className="inline-flex items-center gap-2 rounded-full surface-forest px-6 py-3.5 text-sm font-semibold shadow-soft transition-transform hover:-translate-y-0.5"
               >
                 {t.hero.cta}
                 <ArrowRight className="size-4" />
-              </a>
+              </Link>
               <a
-                href="#story"
+                href="#preise"
                 className="inline-flex items-center rounded-full border border-border bg-card px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
               >
                 {t.hero.secondary}
               </a>
             </div>
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted-foreground">
+              {t.hero.trust.map((x) => (
+                <li key={x} className="flex items-center gap-2">
+                  <Check className="size-4 text-primary" />
+                  {x}
+                </li>
+              ))}
+            </ul>
           </div>
-          <HeroVideo lang={lang} badge={t.hero.priceBadge} />
+          <HeroVideo lang={lang} badge={t.hero.videoBadge} />
         </section>
 
         {/* Benefits */}
-        <section id="services" className="mx-auto max-w-6xl px-5 py-14 md:py-20">
-          <h2 className="text-3xl font-extrabold md:text-4xl">{t.benefits.title}</h2>
+        <section id="leistungen" className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+          <h2 className="text-3xl md:text-4xl">{t.benefits.title}</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             {t.benefits.items.map((item, i) => {
-              const Icon = icons[i] ?? Sparkles;
+              const Icon = [Sparkles, ShieldCheck, Clock][i] ?? Sparkles;
               return (
-                <div
-                  key={item.t}
-                  className="rounded-[1.75rem] border border-border bg-card p-7 transition-shadow hover:shadow-soft"
-                >
+                <div key={item.t} className="rounded-[1.75rem] border border-border bg-card p-7">
                   <span className="grid size-11 place-items-center rounded-2xl bg-accent text-accent-foreground">
                     <Icon className="size-5" />
                   </span>
-                  <h3 className="mt-5 text-lg font-bold">{item.t}</h3>
+                  <h3 className="mt-5 text-xl">{item.t}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.d}</p>
                 </div>
               );
@@ -178,126 +94,63 @@ function Index() {
           </div>
         </section>
 
-        <LeafSection t={t.leaves} />
-
-        {/* Pricing */}
-        <section id="pricing" className="mx-auto max-w-6xl px-5 py-14 md:py-20">
-          <div className="rounded-[2.25rem] surface-forest p-6 md:p-12">
-            <h2 className="text-3xl font-extrabold md:text-4xl">{t.pricing.title}</h2>
-            <p className="mt-2 opacity-80">{t.pricing.sub}</p>
-
-            <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {t.pricing.plans.map((p) => {
-                const active = plan === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => setPlan(p.id as PlanId)}
-                    className={`rounded-[1.5rem] p-6 text-left transition-all ${
-                      active
-                        ? "bg-accent text-accent-foreground ring-2 ring-accent"
-                        : "bg-card text-card-foreground hover:-translate-y-1"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm font-semibold">{p.name}</span>
-                      {active && <Check className="size-4 shrink-0" />}
-                    </div>
-                    <div className="mt-4 text-3xl font-extrabold">{p.price}</div>
-                    <div className="text-xs font-medium opacity-70">CHF · {p.note}</div>
-                    <p className="mt-3 text-xs leading-relaxed opacity-80">{p.desc}</p>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Tip */}
-            <div className="mt-8 rounded-[1.5rem] bg-card p-6 text-card-foreground md:p-8">
-              <h3 className="text-lg font-bold">{t.pricing.tipTitle}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{t.pricing.tipSub}</p>
-              <div className="mt-5 flex flex-wrap items-center gap-3">
-                {TIPS.map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => {
-                      setTip(amount);
-                      setCustomTip("");
-                    }}
-                    className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
-                      tip === amount && customTip === ""
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-border bg-background hover:bg-secondary"
-                    }`}
-                  >
-                    {amount === 0 ? "0 CHF" : `${amount / 100}.– CHF`}
-                  </button>
-                ))}
-                <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-1.5">
-                  <input
-                    inputMode="decimal"
-                    value={customTip}
-                    placeholder={t.pricing.custom}
-                    onChange={(e) => {
-                      const v = e.target.value.replace(/[^0-9.]/g, "");
-                      setCustomTip(v);
-                      const num = Math.round(Number(v) * 100);
-                      setTip(Number.isFinite(num) && num > 0 ? Math.min(num, 100000) : 0);
-                    }}
-                    className="w-28 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                  />
-                  <span className="text-sm font-semibold text-muted-foreground">CHF</span>
-                </div>
-              </div>
-
-              <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
-                <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    {t.pricing.total}
-                  </div>
-                  <div className="text-3xl font-extrabold">
-                    {chf(total)} CHF
-                    {intervalLabel && (
-                      <span className="text-base font-semibold text-muted-foreground">
-                        {intervalLabel}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={handleCheckout}
-                  disabled={loading}
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5 disabled:opacity-60"
-                >
-                  {loading && <Loader2 className="size-4 animate-spin" />}
-                  {loading ? t.pricing.loading : t.pricing.checkout}
-                </button>
-              </div>
-              <p className="mt-4 text-xs text-muted-foreground">{t.pricing.secure}</p>
-              {error && <p className="mt-2 text-xs font-medium text-destructive">{error}</p>}
-            </div>
-          </div>
+        {/* How it works */}
+        <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+          <h2 className="text-3xl md:text-4xl">{t.steps.title}</h2>
+          <ol className="mt-8 grid gap-5 md:grid-cols-3">
+            {t.steps.items.map((s, i) => {
+              const Icon = [ListChecks, CalendarCheck, Truck][i] ?? ListChecks;
+              return (
+                <li key={s.t} className="relative rounded-[1.75rem] bg-secondary p-7">
+                  <span className="font-display text-5xl text-primary/15">{i + 1}</span>
+                  <Icon className="absolute right-7 top-7 size-6 text-primary" />
+                  <h3 className="mt-2 text-xl">{s.t}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+                </li>
+              );
+            })}
+          </ol>
         </section>
 
-        {/* Region */}
-        <section className="mx-auto max-w-6xl px-5 py-6 md:py-10">
-          <div className="flex flex-col items-start gap-3 rounded-[1.75rem] bg-accent p-8 text-accent-foreground md:flex-row md:items-center md:gap-6">
-            <MapPin className="size-6 shrink-0" />
-            <div>
-              <p className="text-lg font-bold">{t.region.title}</p>
-              <p className="mt-1 text-sm opacity-80">{t.region.sub}</p>
+        <LeafSection t={t.leaves} />
+
+        <PriceList lang={lang} t={t} />
+
+        {/* Hours & region */}
+        <section className="mx-auto max-w-6xl px-5 py-8 md:py-12">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-[1.75rem] bg-accent p-8 text-accent-foreground">
+              <MapPin className="size-6" />
+              <p className="mt-4 text-xl font-display">{t.hours.region}</p>
+              <p className="mt-2 text-sm opacity-80">{t.hours.regionSub}</p>
+            </div>
+            <div className="rounded-[1.75rem] border border-border bg-card p-8">
+              <Clock className="size-6 text-primary" />
+              <p className="mt-4 text-xl font-display">{t.hours.title}</p>
+              <dl className="mt-3 space-y-2 text-sm">
+                {t.hours.rows.map((r) => (
+                  <div
+                    key={r.d}
+                    className="flex justify-between gap-4 border-b border-border pb-2 last:border-0"
+                  >
+                    <dt className="font-semibold">{r.d}</dt>
+                    <dd className="text-muted-foreground">{r.h}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
           </div>
         </section>
 
         {/* Story */}
         <section
-          id="story"
+          id="ueber-uns"
           className="relative mx-auto max-w-3xl overflow-hidden px-5 py-14 text-center md:py-24"
         >
           <svg
             viewBox="0 0 32 32"
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-1/2 -z-0 w-[26rem] max-w-[80%] -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
+            className="pointer-events-none absolute left-1/2 top-1/2 w-[26rem] max-w-[80%] -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
           >
             <rect width="32" height="32" fill="#D52B1E" />
             <rect x="13" y="6" width="6" height="20" fill="#fff" />
@@ -306,70 +159,166 @@ function Index() {
           <span className="relative inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-muted-foreground">
             {t.story.goal}
           </span>
-          <h2 className="relative mt-5 text-3xl font-extrabold md:text-4xl">{t.story.title}</h2>
+          <h2 className="relative mt-5 text-3xl md:text-4xl">{t.story.title}</h2>
           <p className="relative mt-5 text-lg leading-relaxed text-muted-foreground">
             {t.story.body}
           </p>
         </section>
+
+        {/* FAQ */}
+        <section id="faq" className="mx-auto max-w-3xl px-5 pb-16 md:pb-24">
+          <h2 className="text-3xl md:text-4xl">{t.faq.title}</h2>
+          <Accordion type="single" collapsible className="mt-6">
+            {t.faq.items.map((f, i) => (
+              <AccordionItem key={f.q} value={`f${i}`}>
+                <AccordionTrigger className="text-base font-semibold hover:no-underline">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </section>
       </main>
 
-      <footer id="contact" className="surface-forest">
-        <div className="mx-auto grid max-w-6xl gap-8 px-5 py-14 md:grid-cols-2">
-          <div>
-            <div className="flex items-center gap-2 text-xl font-extrabold">
-              <img src="/serevo-logo.png" alt="Serevo Logo" className="size-9 object-contain" />
-              Serevo
-            </div>
-            <p className="mt-4 max-w-sm text-sm opacity-80">{t.region.title}</p>
-            <p className="mt-6 flex items-center gap-2 text-sm opacity-80">
-              <svg
-                viewBox="0 0 32 32"
-                className="size-5 rounded-sm"
-                aria-label="Schweiz"
-                role="img"
-              >
-                <rect width="32" height="32" fill="#D52B1E" />
-                <rect x="13" y="6" width="6" height="20" fill="#fff" />
-                <rect x="6" y="13" width="20" height="6" fill="#fff" />
-              </svg>
-              {t.footer.made}
-            </p>
-          </div>
-          <div className="md:justify-self-end">
-            <h3 className="text-sm font-bold uppercase tracking-wide opacity-70">
-              {t.footer.contact}
-            </h3>
-            <a
-              href="mailto:serevo.services@gmail.com"
-              className="mt-4 flex items-center gap-3 text-sm font-semibold hover:underline"
-            >
-              <Mail className="size-4" />
-              serevo.services@gmail.com
-            </a>
-            <a
-              href="tel:+41797401171"
-              className="mt-3 flex items-center gap-3 text-sm font-semibold hover:underline"
-            >
-              <Phone className="size-4" />
-              +41 79 740 11 71
-            </a>
-            <a
-              href="https://wa.me/41797401171"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-6 inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground"
-            >
-              WhatsApp
-            </a>
-          </div>
-        </div>
-        <div className="border-t border-primary-foreground/15 py-5 text-center text-xs opacity-60">
-          © {new Date().getFullYear()} Serevo
-        </div>
-      </footer>
+      <SiteFooter />
+      <WhatsAppButton />
     </div>
   );
 }
+
+// ---------- price list ----------
+
+function PriceRow({ s, lang }: { s: Service; lang: Lang }) {
+  return (
+    <li className="flex items-center justify-between gap-3 py-3">
+      <div className="min-w-0">
+        <p className="font-semibold">
+          {s.name[lang]}
+          {s.seasonal && (
+            <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+              {s.seasonal[lang]}
+            </span>
+          )}
+          {s.highlight && (
+            <span className="ml-2 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-foreground">
+              {s.highlight[lang]}
+            </span>
+          )}
+        </p>
+        <p className="text-xs text-muted-foreground">{s.unit[lang]}</p>
+      </div>
+      <div className="flex shrink-0 items-center gap-3">
+        <span className="font-display text-lg">{chf(s.price)}</span>
+        <Link
+          to="/buchen"
+          search={{ add: s.id }}
+          aria-label={`${s.name[lang]} ${lang === "de" ? "buchen" : "book"}`}
+          className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
+        >
+          +
+        </Link>
+      </div>
+    </li>
+  );
+}
+
+function PriceList({ lang, t }: { lang: Lang; t: Copy }) {
+  const packages = SERVICES.filter((s) => s.category === "packages");
+  return (
+    <section id="preise" className="mx-auto max-w-6xl px-5 py-12 md:py-20">
+      <h2 className="text-3xl md:text-4xl">{t.prices.title}</h2>
+      <p className="mt-2 text-muted-foreground">{t.prices.sub}</p>
+
+      {/* packages */}
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
+        {packages.map((p, i) => (
+          <div
+            key={p.id}
+            className={`flex flex-col rounded-[1.75rem] p-7 ${i === 0 ? "surface-forest" : "bg-accent text-accent-foreground"}`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-2xl">{p.name[lang]}</h3>
+              {p.highlight && (
+                <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
+                  {p.highlight[lang]}
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm opacity-80">{p.desc?.[lang]}</p>
+            <p className="mt-5 font-display text-4xl">
+              <span className="text-base font-sans font-semibold opacity-70">
+                {lang === "de" ? "ab " : "from "}
+              </span>
+              {chf(p.price)}
+            </p>
+            <Link
+              to="/buchen"
+              search={{ add: p.id }}
+              className={`mt-6 inline-flex w-fit items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold ${
+                i === 0 ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
+              }`}
+            >
+              {t.prices.book}
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">{t.prices.packageNote}</p>
+
+      {/* single services */}
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
+        {CATEGORIES.filter((c) => c.id !== "packages").map((c) => (
+          <div key={c.id} className="rounded-[1.75rem] border border-border bg-card p-7">
+            <h3 className="text-xl">{c.name[lang]}</h3>
+            <ul className="mt-2 divide-y divide-border">
+              {SERVICES.filter((s) => s.category === c.id).map((s) => (
+                <PriceRow key={s.id} s={s} lang={lang} />
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      {/* compost bin */}
+      <div className="mt-5 rounded-[1.75rem] border border-border bg-card p-7">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h3 className="text-xl">{t.prices.binTitle}</h3>
+            <p className="text-sm text-muted-foreground">{t.prices.binSub}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {BIN_PLANS.map((p) => (
+            <Link
+              key={p.id}
+              to="/buchen"
+              search={{ bin: p.id }}
+              className="group rounded-2xl bg-secondary p-5 transition-colors hover:bg-accent"
+            >
+              <p className="text-sm font-semibold">{p.name[lang]}</p>
+              <p className="mt-2 font-display text-3xl">{chf(p.price)}</p>
+              <p className="text-xs text-muted-foreground">{p.note[lang]}</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-8 text-center">
+        <Link
+          to="/buchen"
+          className="inline-flex items-center gap-2 rounded-full surface-forest px-7 py-3.5 text-sm font-semibold shadow-soft transition-transform hover:-translate-y-0.5"
+        >
+          {t.prices.bookAll}
+          <ArrowRight className="size-4" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+// ---------- hero video ----------
 
 function HeroVideo({ lang, badge }: { lang: Lang; badge: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -387,7 +336,7 @@ function HeroVideo({ lang, badge }: { lang: Lang; badge: string }) {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-[22rem]">
+    <div className="relative mx-auto w-full max-w-[21rem]">
       <div className="overflow-hidden rounded-[2rem] bg-primary shadow-soft">
         <video
           ref={ref}
@@ -432,7 +381,7 @@ function HeroVideo({ lang, badge }: { lang: Lang; badge: string }) {
   );
 }
 
-type LeafCopy = (typeof content)["de"]["leaves"] | (typeof content)["en"]["leaves"];
+// ---------- leaf special ----------
 
 const FALLING_LEAVES = [
   { left: "8%", delay: "0s", dur: "9s", size: 22, color: "var(--accent)" },
@@ -457,9 +406,10 @@ function LeafIcon({ size, color }: { size: number; color: string }) {
   );
 }
 
-function LeafSection({ t }: { t: LeafCopy }) {
+function LeafSection({ t }: { t: Copy["leaves"] }) {
+  const sweep = SERVICES.find((s) => s.id === "sweep");
   return (
-    <section id="laub" className="mx-auto max-w-6xl px-5 py-14 md:py-20">
+    <section id="laub" className="mx-auto max-w-6xl px-5 py-12 md:py-16">
       <div className="relative overflow-hidden rounded-[2.25rem] surface-forest p-7 md:p-12">
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           {FALLING_LEAVES.map((l, i) => (
@@ -479,7 +429,7 @@ function LeafSection({ t }: { t: LeafCopy }) {
               <Leaf className="size-3.5" />
               {t.badge}
             </span>
-            <h2 className="mt-5 text-3xl font-extrabold md:text-5xl">{t.title}</h2>
+            <h2 className="mt-5 text-4xl md:text-5xl">{t.title}</h2>
             <p className="mt-4 max-w-lg text-lg opacity-85">{t.sub}</p>
             <ul className="mt-7 grid gap-3 sm:grid-cols-2">
               {t.points.map((p) => (
@@ -497,24 +447,30 @@ function LeafSection({ t }: { t: LeafCopy }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {t.priceLabel}
             </p>
-            <p className="mt-1 text-3xl font-extrabold">{t.price}</p>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.priceNote}</p>
+            <p className="mt-1 font-display text-4xl">
+              {chf(sweep?.price ?? 500)}{" "}
+              <span className="text-base font-sans font-semibold text-muted-foreground">
+                {t.unit}
+              </span>
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t.example}</p>
             <div className="mt-6 flex flex-col gap-3">
-              <a
-                href={`https://wa.me/41797401171?text=${encodeURIComponent(t.whatsappText)}`}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                to="/buchen"
+                search={{ add: "sweep" }}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5"
               >
-                <MessageCircle className="size-4" />
-                {t.ctaWhatsapp}
-              </a>
+                <CalendarCheck className="size-4" />
+                {t.cta}
+              </Link>
               <a
-                href="tel:+41797401171"
+                href={whatsappUrl(t.whatsappText)}
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background px-6 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
               >
-                <Phone className="size-4" />
-                079 740 11 71
+                <MessageCircle className="size-4" />
+                {t.whatsapp}
               </a>
             </div>
           </div>
